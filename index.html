@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- ============================================================
+     极简游记模板 · 修改指南（正式使用时可删除本注释）
+     1. 改文字：直接在下方找到对应文字修改即可。
+     2. 换图片：把新图片放进 assets 文件夹替换同名文件，或修改 <img> 的 src。
+     3. 改配色：只需修改 :root 里的几个颜色变量。
+     4. 图片有三种写法，正文里都有示例，复制对应整块即可：
+        ① 单张图：<figure>...</figure>
+        ② 两张并排：<div class="fig-pair"> 里放两个 <figure>
+        ③ 滑动图集：<div class="slideshow" data-slideshow>，在 .slides 里增删 <img>；
+           每张图的图注写在该 <img> 的 data-caption 属性里，滑动时自动切换
+     5. 双击本文件即可在浏览器打开，无需安装任何东西。
+============================================================ -->
+<title>全国飞行记 — 飞行日志</title>
+<meta name="description" content="一篇暑期的飞行游记。">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%232F4A3A'/%3E%3Cpath d='M4 23 L12 12 L17 18 L20 14 L28 23 Z' fill='none' stroke='%23F6F5F1' stroke-width='1.6' stroke-linejoin='round'/%3E%3Ccircle cx='22' cy='9' r='2.4' fill='none' stroke='%23F6F5F1' stroke-width='1.4'/%3E%3C/svg%3E">
+
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@500;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap">
+
+<style>
+/* ===== 配色变量：改色只改这里 ===== */
+:root{
+  --paper:    #F6F5F1;  /* 页面底色 */
+  --ink:      #232521;  /* 正文 */
+  --ink-soft: #7A7B73;  /* 次要文字 */
+  --line:     #DDDAD2;  /* 分隔线 */
+  --accent:   #2F4A3A;  /* 强调色：松绿 */
+  --serif: "Noto Serif SC","Songti SC","STSong",serif;
+  --sans:  "Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-weight:300;
+  font-size:16.5px;
+  line-height:1.95;
+  letter-spacing:.02em;
+  -webkit-font-smoothing:antialiased;
+}
+img{display:block;max-width:100%;}
+a{color:var(--accent);text-decoration:none;}
+a:hover{text-decoration:underline;text-underline-offset:4px;}
+::selection{background:var(--accent);color:#fff;}
+
+/* ===== 顶部导航 ===== */
+.site-header{
+  max-width:760px;margin:0 auto;
+  padding:34px 24px 0;
+  display:flex;align-items:baseline;justify-content:space-between;
+}
+.site-header .brand{
+  font-family:var(--serif);font-weight:600;
+  font-size:18px;letter-spacing:.16em;color:var(--ink);
+  padding:8px 0;
+}
+.site-header .brand:hover{text-decoration:none;}
+.site-header nav{display:flex;gap:26px;}
+.site-header nav a{
+  font-size:14px;letter-spacing:.12em;color:var(--ink-soft);
+  padding:10px 2px;
+}
+.site-header nav a:hover{color:var(--accent);text-decoration:none;}
+
+/* ===== 文章容器 ===== */
+.article{
+  max-width:760px;margin:0 auto;
+  padding:70px 24px 0;
+}
+.post-title{
+  font-family:var(--serif);font-weight:600;
+  font-size:clamp(27px,5vw,38px);
+  line-height:1.4;letter-spacing:.05em;
+}
+.post-meta{
+  margin-top:14px;font-size:13.5px;
+  color:var(--ink-soft);letter-spacing:.1em;
+}
+.post-cover{margin:40px 0 8px;}
+.post-cover img{width:100%;}
+
+/* 导语 */
+.lead{
+  font-family:var(--serif);font-weight:500;
+  font-size:19px;line-height:1.9;color:var(--ink);
+  margin:36px 0 8px;
+}
+
+/* 正文 */
+.article p{margin:24px 0;color:#33352F;}
+.article h2{
+  font-family:var(--serif);font-weight:600;
+  font-size:22px;letter-spacing:.08em;
+  margin:48px 0 4px;
+}
+figure{margin:38px 0;}
+figure img{width:100%;}
+figcaption{
+  margin-top:10px;text-align:center;
+  font-size:13px;color:var(--ink-soft);letter-spacing:.06em;
+}
+
+/* 图片形式②：双图并排，各占一半；手机端自动上下堆叠 */
+.fig-pair{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  margin:38px 0;
+}
+.fig-pair figure{margin:0;}
+
+/* 图片形式③：横向滑动图集 */
+.slideshow{
+  margin:38px 0;
+}
+/* 视口层：按钮与页码相对它定位，图注在它外面，互不干扰 */
+.slides-viewport{
+  position:relative;
+  overflow:hidden;
+}
+.slides{
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  scrollbar-width:none;        /* Firefox 隐藏滚动条 */
+}
+.slides::-webkit-scrollbar{display:none;} /* Chrome/Edge 隐藏滚动条 */
+.slides img{
+  flex:0 0 100%;               /* 每张图占满一屏，一次看一张 */
+  aspect-ratio:3/2;            /* 统一窗口高度，避免滑动时跳动 */
+  object-fit:cover;
+  scroll-snap-align:center;
+}
+/* 左右箭头按钮 */
+.slide-btn{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:42px;height:42px;border-radius:50%;
+  background:rgba(252,251,247,.9);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--accent);
+  transition:background .25s,opacity .25s;
+}
+.slide-btn:hover{background:var(--paper-raised);}
+.slide-btn.prev{left:12px;}
+.slide-btn.next{right:12px;}
+.slide-btn:disabled{opacity:.3;cursor:default;}
+/* 页码标记 */
+.slide-counter{
+  position:absolute;right:12px;bottom:12px;
+  background:rgba(30,38,32,.62);color:#fff;
+  font-size:12px;letter-spacing:.08em;
+  padding:3px 11px;
+}
+/* 随图片切换的图注：位置固定在图片下方，切换时淡入淡出 */
+.slideshow-caption{
+  margin:12px 0 0;
+  text-align:center;
+  font-size:13px;line-height:1.7;
+  color:var(--ink-soft);letter-spacing:.06em;
+  min-height:1.6em;
+  transition:opacity .28s ease;
+}
+.slideshow-caption.switching{opacity:0;}
+@media (max-width:600px){
+  .fig-pair{grid-template-columns:1fr;gap:24px;}
+}
+
+/* 文末署名 */
+.signoff{
+  margin:64px 0 0;padding-top:26px;
+  border-top:1px solid var(--line);
+  font-size:14px;color:var(--ink-soft);letter-spacing:.1em;
+}
+
+/* ===== 关于 ===== */
+.about{
+  max-width:760px;margin:0 auto;
+  padding:72px 24px 0;
+}
+.about h2{
+  font-family:var(--serif);font-weight:600;
+  font-size:20px;letter-spacing:.12em;margin-bottom:14px;
+}
+.about p{font-size:15px;color:var(--ink-soft);}
+
+/* ===== 页脚 ===== */
+.site-footer{
+  max-width:760px;margin:0 auto;
+  padding:72px 24px 44px;
+  font-size:13px;color:var(--ink-soft);letter-spacing:.08em;
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+}
+
+/* ===== 手机端 ===== */
+@media (max-width:600px){
+  body{font-size:16px;}
+  .site-header{padding-top:26px;}
+  .article{padding-top:52px;}
+  .article h2{margin:40px 0 2px;}
+}
+</style>
+</head>
+<body>
+
+<!-- 顶部导航：修改站点名与链接 -->
+<header class="site-header">
+  <a class="brand" href="#top">飞行日志</a>
+  <nav>
+    <a href="#top">游记</a>
+    <a href="#about">关于</a>
+  </nav>
+</header>
+
+<!-- 游记正文：直接替换示例文字 -->
+<article class="article" id="top">
+  <h1 class="post-title">全国飞行记</h1>
+  <p class="post-meta">2026 年 7 月 - 9 月</p>
+
+  <!-- 题图：替换 assets/hero.jpg 即可换图 -->
+  <div class="post-cover">
+    <img src="assets/flying.jpg" alt="部分飞行航线图">
+  </div>
+
+  <p class="lead">相信命运的推背感。</p>
+
+  <p>从2026年7月到9月，累计飞行6次，累计乘坐高铁8次。抵达5个城市，9个目的地。</p>
+
+  <!--第一站------------------------------------------------------------------------- -->
+  <h2>第一站：中国科学院上海技术物理研究所</h2>
+  <h4>2025.08 - 2026.07</h4>
+  <p>这是我最早接触的一站，要从2025年8月参加暑期科研实习开始。当时从武汉比完赛，马上跑去上海，极限五分钟在武汉高铁站上车。那时爽玩了三个星期，把大大小小街道，和各种各样的美食都体验了一遍。</p>
+
+  <div class="fig-pair">
+    <figure>
+      <img src="assets/sitp1.jpg" alt="" loading="lazy">
+      <figcaption>市中心的大门</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/sitp2.jpg" alt="" loading="lazy">
+      <figcaption>实习的实验室</figcaption>
+    </figure>
+  </div>
+
+  <div class="slideshow" data-slideshow>
+   <div class="slides-viewport">
+    <div class="slides">
+      <img src="assets/happy1.jpg" alt="外滩夜景" data-caption="第一个晚上看的外滩" loading="lazy">
+      <img src="assets/happy2.jpg" alt="小路" data-caption="citywalk看到的小路，很有夏天的感觉" loading="lazy">
+      <img src="assets/happy3.jpg" alt="武康大楼" data-caption="武康大楼" loading="lazy">
+      <img src="assets/happy5.jpg" alt="寿司" data-caption="金匠寿司，抽中奖了！" loading="lazy">
+      <img src="assets/happy6.jpg" alt="山缓缓" data-caption="回到青岛后仍念念不忘的山缓缓" loading="lazy">
+      <img src="assets/happy7.jpg" alt="饭" data-caption="分量超大的饭" loading="lazy">
+      <img src="assets/happy8.jpg" alt="泰餐" data-caption="rich师兄请吃的泰餐，师兄随手拿下大几百的墨镜" loading="lazy">
+      <img src="assets/happy9.jpg" alt="红茶公司" data-caption="红茶公司，上海最好喝的奶茶没有之一" loading="lazy">
+      <img src="assets/happy10.jpg" alt="椿田熟成" data-caption="椿田熟成" loading="lazy">
+      <img src="assets/happy11.jpg" alt="东方明珠" data-caption="没有买蜜雪冰城，但还是被东方明珠射击" loading="lazy">
+      <img src="assets/happy12.jpg" alt="外滩日景" data-caption="白天的外滩" loading="lazy">
+      <img src="assets/happy13.jpg" alt="开心麻花" data-caption="开心麻花剧场，不好笑" loading="lazy">
+      <img src="assets/happy14.jpg" alt="peet" data-caption="peet初体验，惊为天人" loading="lazy">
+      <img src="assets/happy15.jpg" alt="高级大楼" data-caption="南京路的高级大楼" loading="lazy">
+    </div>
+    <button class="slide-btn prev" aria-label="上一张">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M15 5 L8 12 L15 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="slide-btn next" aria-label="下一张">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M9 5 L16 12 L9 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="slide-counter"><span class="current">1</span> / <span class="total">1</span></div>
+   </div>
+    <!-- 图注文字由脚本从当前图片的 data-caption 读取，无需手写 -->
+    <p class="slideshow-caption" aria-live="polite"></p>
+  </div>
+
+  <figure>
+    <img src="assets/happy4.jpg" alt="和朋友们" loading="lazy">
+    <figcaption>最幸福的是和朋友们玩</figcaption>
+  </figure>
+
+  <p>2026年1月底，刚考完期末考，去参加技物所冬令营。非常匆忙的赶完汇报，又去参观嘉定园区的实验室，还吃了大餐。</p>
+
+  <div class="slideshow" data-slideshow>
+   <div class="slides-viewport">
+    <div class="slides">
+      <img src="assets/winter1.jpg" alt="冬令营礼包" data-caption="发的小礼物和餐券" loading="lazy">
+      <img src="assets/winter2.jpg" alt="冬令营开营仪式" data-caption="冬令营开营仪式" loading="lazy">
+      <img src="assets/winter3.jpg" alt="围餐" data-caption="和老师一起吃的围餐，很合我胃口" loading="lazy">
+      <img src="assets/winter4.jpg" alt="汇报" data-caption="紧张汇报" loading="lazy">
+      <img src="assets/winter5.jpg" alt="参观嘉定园区的盒饭" data-caption="参观嘉定园区的盒饭" loading="lazy">
+      <img src="assets/winter6.jpg" alt="参观上海城市博物馆" data-caption="上海城市博物馆" loading="lazy">
+      <img src="assets/winter7.jpg" alt="酒店" data-caption="独享酒店！" loading="lazy">
+    
+    </div>
+    <button class="slide-btn prev" aria-label="上一张">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M15 5 L8 12 L15 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="slide-btn next" aria-label="下一张">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M9 5 L16 12 L9 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="slide-counter"><span class="current">1</span> / <span class="total">1</span></div>
+   </div>
+    <!-- 图注文字由脚本从当前图片的 data-caption 读取，无需手写 -->
+    <p class="slideshow-caption" aria-live="polite"></p>
+  </div>
+
+  <p>七月初通过一个线上面试，拿到offer，感谢技物所，让我心安。</p>
+
+  <!-- ------------------------------------------------------------------------- -->
+  
+  <h2>第二站：中山大学（深圳）</h2>
+  <h4>2026.07.13 - 2026.07.14</h4>
+  <p>第一个正式参加的夏令营，让我没考完期末考就离开学校了。虽然参加的很早，但是结果在填系统前几天才出，而且还超发了。</p>
+  <p>面试内容非常简单，英文问答（对深圳有什么印象）+中文，问这些项目是依托什么平台的，为什么大职只修了2和4，为什么没有心理健康课程的成绩等等。</p>
+
+  <figure>
+    <img src="assets/sysusz (1).jpg" alt="合影" loading="lazy">
+    <figcaption>据说第一张合影的学校，就是最终的去向</figcaption>
+  </figure>
+
+  <!-- 图片形式③：滑动图集。在 .slides 里复制 <img> 即可加图，箭头与页码由脚本自动生成状态 -->
+  <div class="slideshow" data-slideshow>
+   <div class="slides-viewport">
+    <div class="slides">
+      <img src="assets/sysusz (2).jpg" alt="湘菜啊" data-caption="落地第一顿，感谢Bonnie请的湘菜啊！" loading="lazy">
+      <img src="assets/sysusz (3).jpg" alt="开营仪式" data-caption="开营仪式" loading="lazy">
+      <img src="assets/sysusz (4).jpg" alt="发的餐券" data-caption="发的餐券，扣扣嗖嗖，只有几个窗口能吃" loading="lazy">
+      <img src="assets/sysusz (5).jpg" alt="美味的粉" data-caption="美味的粿条，Bonnie请的饭+1" loading="lazy">
+      <img src="assets/sysusz (6).jpg" alt="夜游" data-caption="坐上小电动车，夜游校园" loading="lazy">
+      <img src="assets/sysusz (7).jpg" alt="校门" data-caption="校门+1" loading="lazy">
+      <img src="assets/sysusz (8).jpg" alt="展板" data-caption="签到处" loading="lazy">
+      <img src="assets/sysusz (9).jpg" alt="山外面" data-caption="山外面太好吃了，回到广州后连吃几顿" loading="lazy">
+      <img src="assets/sysusz (10).jpg" alt="弹珠" data-caption="赶高铁，要走了珠子反而翻倍了" loading="lazy">
+    </div>
+    <button class="slide-btn prev" aria-label="上一张">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M15 5 L8 12 L15 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="slide-btn next" aria-label="下一张">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M9 5 L16 12 L9 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="slide-counter"><span class="current">1</span> / <span class="total">1</span></div>
+   </div>
+    <!-- 图注文字由脚本从当前图片的 data-caption 读取，无需手写 -->
+    <p class="slideshow-caption" aria-live="polite"></p>
+  </div>
+
+  <p>非常感谢Bonnie请我吃了好多顿饭！还带我转了校园，太大了深圳校区，虽然很偏僻。</p>
+
+  
+<!-- ------------------------------------------------------------------------- -->
+  
+  <h2>第三站：HKUST(GZ)</h2>
+  <h4>2026.07.23 - 2026.07.24</h4>
+  <p>非常奇妙的面试体验。分为群面和个面。红鸟项目非常注重跨学科的创新能力和ai的融合。</p>
+
+  <figure>
+    <img src="assets/hk5.jpg" alt="合影" loading="lazy">
+    <figcaption>合影</figcaption>
+  </figure>
+
+  <p>早上群面，在一定时间内随机分配的一个小组的人，围绕一个主题词，搭建一个项目，展现形式可以是积木，绘画，思维导图等。可以在特定阶段使用ai，但实际我们觉得ai还没有我们想的快。</p>
+  <p>我们抽到的主题是低空经济，关键词是无人机物流路径规划师。我们设定的场景是在深圳外卖快递等无人机物流配送。然后提出相应的问题。制作分成六个模块，分别是用户层面、自提点仓库、基站、地图路线规划、AI辅助教育、还有最终的系统集成。我负责自提点和基站模块，主要要解决最后一公里的配送难题。</p>
+  <p>搭建完成之后，还要和其他小组互相挑战，质疑和借鉴。最终向评委老师展示我们的成果，全程都有得分点。因为我坐的距离老师太远，而且回答问题时被其他同学粗鲁的打断，没有抢到得分点。真的是非常看运气。</p>
+  <p>如果评委中有外籍老师，需要全称英文讨论，隔壁小组非常幸运抽中了，在整个过程中他们讨论都很安静。</p>
+
+  <!-- 图片形式③：滑动图集。在 .slides 里复制 <img> 即可加图，箭头与页码由脚本自动生成状态 -->
+  <div class="slideshow" data-slideshow>
+   <div class="slides-viewport">
+    <div class="slides">
+      <img src="assets/hk1.jpg" alt="HIGHBAY" data-caption="群面现场HIGHBAY" loading="lazy">
+      <img src="assets/hk2.jpg" alt="我们组的成果" data-caption="最终的展示" loading="lazy">
+      <img src="assets/hk3.jpg" alt="积木" data-caption="最终的积木模型" loading="lazy">
+      <img src="assets/hk4.jpg" alt="合影" data-caption="小组" loading="lazy">
+    </div>
+    <button class="slide-btn prev" aria-label="上一张">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M15 5 L8 12 L15 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="slide-btn next" aria-label="下一张">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M9 5 L16 12 L9 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="slide-counter"><span class="current">1</span> / <span class="total">1</span></div>
+   </div>
+    <!-- 图注文字由脚本从当前图片的 data-caption 读取，无需手写 -->
+    <p class="slideshow-caption" aria-live="polite"></p>
+  </div>
+
+  <p>下午个面，早上和下午间隔一个小时，只够吃饭的时间，非常累人。个面需要自我介绍的时候全英，回答评委问题的时候中文。如果有外籍评委则全程英文。</p>
+  <p>个人介绍主要围绕一个问题展开，其中穿插自己的项目经历等。不是普通的自我介绍。整个流程比较轻松，就是等待的时候，空调非常足，冻的人发抖。</p>
+  <p>整个得分我感觉主要看早上的群面，纯看运气，看能不能分配到好的队友，共同商讨而不是一人言。下午的个面每个人都差不多，拉开不了差距。</p>
+
+  <!-- 图片形式③：滑动图集。在 .slides 里复制 <img> 即可加图，箭头与页码由脚本自动生成状态 -->
+  <div class="slideshow" data-slideshow>
+   <div class="slides-viewport">
+    <div class="slides">
+      <img src="assets/hk6.jpg" alt="宿舍" data-caption="单人宿舍" loading="lazy">
+      <img src="assets/hk11.jpg" alt="宿舍" data-caption="宿舍客厅" loading="lazy">
+      <img src="assets/hk7.jpg" alt="工作区域" data-caption="红鸟工作区" loading="lazy">
+      <img src="assets/hk8.jpg" alt="傍晚" data-caption="傍晚开灯的大楼，科技感" loading="lazy">
+      <img src="assets/hk9.jpg" alt="图书馆" data-caption="图书馆，全是英文书" loading="lazy">
+      <img src="assets/hk10.jpg" alt="红鸟工作区" data-caption="红鸟工作区" loading="lazy">
+    </div>
+    <button class="slide-btn prev" aria-label="上一张">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M15 5 L8 12 L15 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="slide-btn next" aria-label="下一张">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M9 5 L16 12 L9 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="slide-counter"><span class="current">1</span> / <span class="total">1</span></div>
+   </div>
+    <!-- 图注文字由脚本从当前图片的 data-caption 读取，无需手写 -->
+    <p class="slideshow-caption" aria-live="polite"></p>
+  </div>
+
+  <p>宿舍实在是太豪华了，单人单间，八个人一个厨房客厅，两个卫生间，四个洗漱台。我的舍友有的是西南大学的兽医学专业，有的是重庆大学的管理学，还有华南理工的微电子。专业真是五花八门。</p>
+  
+  <div class="fig-pair">
+    <figure>
+      <img src="assets/hk12.jpg" alt="" loading="lazy">
+      <figcaption>北方家宴</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/hk13.jpg" alt="" loading="lazy">
+      <figcaption>面试后终于可以放松了</figcaption>
+    </figure>
+  </div>
+
+  <p>幸运有朋友，感谢悦然请的北方家宴，还带我逛了学校，好久不见！感谢610请的粉，面试完终于可以休息了。</p>
+
+
+<!-- ------------------------------------------------------------------------- -->
+  
+  <h2>第四站：上海交通大学</h2>
+  <h4>2026.07.27 - 2026.07.28</h4>
+  <p>第n次来上海，也是最压力的一个面试。</p>
+
+  <div class="fig-pair">
+    <figure>
+      <img src="assets/sjtu2.jpg" alt="" loading="lazy">
+      <figcaption>旁晚的校门非常美丽</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/sjtu1.jpg" alt="" loading="lazy">
+      <figcaption>签到</figcaption>
+    </figure>
+  </div>
+  <p>第一天是开营仪式，各个老师介绍自己的研究方向。第二天面试。</p>
+  <p>第二天的面试异常恐怖，完完全全拷打十分钟，只有简历面，没有ppt，有七八个老师，对着那张纸连续不间断的问几十个问题，快得没办法反应。其中有一个女老师非常mean，每次回答完一个问题之后都会翻白眼表示蔑视，还假装捂嘴笑来嘲笑。</p>
+  
+  <!-- 图片形式③：滑动图集。在 .slides 里复制 <img> 即可加图，箭头与页码由脚本自动生成状态 -->
+  <div class="slideshow" data-slideshow>
+   <div class="slides-viewport">
+    <div class="slides">
+      <img src="assets/sjtu3.jpg" alt="开营仪式" data-caption="开营仪式，王景川老师主持" loading="lazy">
+      <img src="assets/sjtu4.jpg" alt="发的礼物" data-caption="参营礼包，还有衣服" loading="lazy">
+      <img src="assets/sjtu5.jpg" alt="鸽子" data-caption="湖边有超级多鸽子" loading="lazy">
+      <img src="assets/sjtu6.jpg" alt="小鹿" data-caption="校园里居然有几只小鹿" loading="lazy">
+      <img src="assets/sjtu7.jpg" alt="荷花" data-caption="深处的荷花，好有意境" loading="lazy">
+      <img src="assets/sjtu8.jpg" alt="文创" data-caption="购入许多上交文创" loading="lazy">
+    </div>
+    <button class="slide-btn prev" aria-label="上一张">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M15 5 L8 12 L15 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="slide-btn next" aria-label="下一张">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M9 5 L16 12 L9 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="slide-counter"><span class="current">1</span> / <span class="total">1</span></div>
+   </div>
+    <!-- 图注文字由脚本从当前图片的 data-caption 读取，无需手写 -->
+    <p class="slideshow-caption" aria-live="polite"></p>
+  </div>
+
+  <p>校园超级无敌大，非常大。有很多有意思的地方，有小鹿，有类似园林的建筑，很有大学校园气息啊！</p>
+
+  <!-- 图片形式③：滑动图集。在 .slides 里复制 <img> 即可加图，箭头与页码由脚本自动生成状态 -->
+  <div class="slideshow" data-slideshow>
+   <div class="slides-viewport">
+    <div class="slides">
+      <img src="assets/sjtu9.jpg" alt="合影" data-caption="感谢导游余总" loading="lazy">
+      <img src="assets/sjtu10.jpg" alt="合影" data-caption="好看的大门合影+1" loading="lazy">
+      <img src="assets/sjtu11.jpg" alt="云南菜" data-caption="余总请的美味云南菜" loading="lazy">
+      <img src="assets/sjtu12.jpg" alt="弹珠" data-caption="总是逃不过弹珠的诱惑" loading="lazy">
+      <img src="assets/sjtu13.jpg" alt="红茶公司" data-caption="来上海必喝红茶公司" loading="lazy">
+      <img src="assets/sjtu14.jpg" alt="大门" data-caption="好看的大门+1" loading="lazy">
+    </div>
+    <button class="slide-btn prev" aria-label="上一张">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M15 5 L8 12 L15 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="slide-btn next" aria-label="下一张">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M9 5 L16 12 L9 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="slide-counter"><span class="current">1</span> / <span class="total">1</span></div>
+   </div>
+    <!-- 图注文字由脚本从当前图片的 data-caption 读取，无需手写 -->
+    <p class="slideshow-caption" aria-live="polite"></p>
+  </div>
+<!-- ------------------------------------------------------------------------- -->
+  
+  <h2>第五站：南方科技大学</h2>
+  <h4>2026.07.31</h4>
+  <p>从上海赶回来，无缝衔接南科大，连校门都忘记拍了。</p>
+
+  <figure>
+    <img src="assets/nkd1.jpg" alt="学院楼" loading="lazy">
+    <figcaption>学院其中一栋楼，像工厂</figcaption>
+  </figure>
+
+  <p>荻姐来接我进校门，带我寻找非常深入的学院楼，那天还下雨，非常麻烦。和院长一对一聊了接近两个小时，把我所有的信息都细致的扒了一遍（对后面准备其他面试很有帮助）。</p>
+  <p>结束后荻姐和fy请我吃了非常丰盛的学校餐馆，没想到学校里还有这种餐厅。实在太累了，吃完饭没有参观校园就回去了。</p>
+  
+  <figure>
+    <img src="assets/nkd2.jpg" alt="合影" loading="lazy">
+    <figcaption>匆匆忙忙没有拍照片，只有一张深圳北</figcaption>
+  </figure>
+
+ <!-- ------------------------------------------------------------------------- -->
+  
+  <h2>第六站：复旦大学</h2>
+  <h4>2026.09.02 - 2026.07.03</h4>
+  <p>第n+1次来上海。因为是预推免，且已经到九月份，所有的面试节奏都快很多，这个只有半天的面试时间。</p>
+
+  <figure>
+    <img src="assets/fdu1.jpg" alt="合影" loading="lazy">
+    <figcaption>没有找到校门口大logo，只好在标志性的建筑前自拍一张</figcaption>
+  </figure>
+
+  <p>面试老师很温和，全程微笑，也没有刁难人。英文问答是给出几句英文文献，我很多专业名词都看不懂，磕磕巴巴的结束了。中文主要问和技物所的实习情况（这个院和技物所合作很多），还问复旦在心中排第几志愿等等。</p>
+  <!-- 图片形式③：滑动图集。在 .slides 里复制 <img> 即可加图，箭头与页码由脚本自动生成状态 -->
+  <div class="slideshow" data-slideshow>
+   <div class="slides-viewport">
+    <div class="slides">
+      <img src="assets/fdu2.jpg" alt="大楼" data-caption="复旦大学江湾校区" loading="lazy">
+      <img src="assets/fdu3.jpg" alt="日湖" data-caption="很大的日湖" loading="lazy">
+      <img src="assets/fdu4.jpg" alt="图书馆" data-caption="李兆基图书馆" loading="lazy">
+      <img src="assets/fdu5.jpg" alt="草地" data-caption="非常多的草地" loading="lazy">
+      <img src="assets/fdu6.jpg" alt="路" data-caption="恰逢军训，校园的路都很少人" loading="lazy">
+      <img src="assets/fdu7.jpg" alt="楼" data-caption="某个好看的教学楼" loading="lazy">
+      <img src="assets/fud8.jpg" alt="大门" data-caption="1号门" loading="lazy">
+    </div>
+    <button class="slide-btn prev" aria-label="上一张">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M15 5 L8 12 L15 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="slide-btn next" aria-label="下一张">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M9 5 L16 12 L9 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="slide-counter"><span class="current">1</span> / <span class="total">1</span></div>
+   </div>
+    <!-- 图注文字由脚本从当前图片的 data-caption 读取，无需手写 -->
+    <p class="slideshow-caption" aria-live="polite"></p>
+  </div>
+
+  <p>整个学校只有黄色和绿色，大片的黄色建筑和大片的绿地绿树，有种古老板正朴实的感觉。</p>
+
+<!-- ------------------------------------------------------------------------- -->
+  <h2>第七站：中山大学（东校）</h2>
+  <h4>2026.09.02</h4>
+  <p>在日照实训时，请两天假匆匆赶回。坐了十个小时高铁回去，睡也睡不着，复习也看不下去，差点晕高铁。这次面试时间也是只有半天。我抽中第二天的下午。</p>
+
+  <figure>
+    <img src="assets/good1.jpg" alt="合影" loading="lazy">
+    <figcaption>天气很好</figcaption>
+  </figure>
+
+  <p>当天早上还有南科大的线上面试，幸好错开了半天。感谢湾湾和火卓帮我预约中大图书馆的会议室，还一大早来学校接我进去，让我在里面面试南科大电子系。</p>
+  <!-- 图片形式③：滑动图集。在 .slides 里复制 <img> 即可加图，箭头与页码由脚本自动生成状态 -->
+  <div class="slideshow" data-slideshow>
+   <div class="slides-viewport">
+    <div class="slides">
+      <img src="assets/good2.jpg" alt="早上面试" data-caption="预约会议室面南科大" loading="lazy">
+      <img src="assets/good3.jpg" alt="大门" data-caption="去往学院楼的大门" loading="lazy">
+      <img src="assets/good4.jpg" alt="等候室" data-caption="焦急的等待" loading="lazy">
+      <img src="assets/good5.jpg" alt="泰餐" data-caption="结束后的泰餐，没有平时那么美味" loading="lazy">
+    </div>
+    <button class="slide-btn prev" aria-label="上一张">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M15 5 L8 12 L15 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="slide-btn next" aria-label="下一张">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M9 5 L16 12 L9 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="slide-counter"><span class="current">1</span> / <span class="total">1</span></div>
+   </div>
+    <!-- 图注文字由脚本从当前图片的 data-caption 读取，无需手写 -->
+    <p class="slideshow-caption" aria-live="polite"></p>
+  </div>
+
+  <p>面试等待非常煎熬，因为不知道自己是多少号，不知道要等待多长时间，只有坐在等候室等待叫号，体验感很差。面试英文部分是抽一段英文文献，一个一个词翻译出来，没翻译出来的老师还会倒回去，重新问一遍是什么意思，引导你直至说出这个词的意思，但是老师都很nice，面带微笑。中文问答中规中矩。</p>
+  <p>终于印证了群名，求一个东校见，终于在东校相聚！以后可以每天一起约饭一起上课了。必须单独放的两张图片:</p>
+  <div class="fig-pair">
+    <figure>
+      <img src="assets/good6.jpg" alt="" loading="lazy">
+      <figcaption>求一个东校相见</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/good7.jpg" alt="" loading="lazy">
+      <figcaption>每天都发的表情包（from p图大师竹）</figcaption>
+    </figure>
+  </div>
+  <p>在这期间还把从微信头像换成发光的offer大楼（自从微信注册，我的头像就没有换过）。这段时间也是最难熬的时间，已经接近尾声了，但是没有满意的去向，甚至想过弃保出国。每天状态更新这个offer大楼，心诚则灵！</p>
+  
+<!-- ------------------------------------------------------------------------- -->
+  <h2>第八站：同济大学</h2>
+  <h4>2026.09.17 - 2026.09.18</h4>
+  <p>第n+2次来上海。目前为止已经把上海三个学校都去遍了。</p>
+
+  <figure>
+    <img src="assets/tju1.jpg" alt="合影" loading="lazy">
+    <figcaption>自拍+1</figcaption>
+  </figure>
+
+  <p>同济非常的良心，筛选入营的人数不多，来现场参加的人更是少，可能只有150人不到。</p>
+  <p>虽然已经到了填系统的前两三天了，但是需要笔试和面试。第一天笔试，包括最优化方法与机器学习综合+英语。这两个专业课我都没接触过，极限一天半速成，在飞机地铁上狂看狂背。还花80元大价格购入往年习题，虽然没用。</p>
+  <p>第二天面试老师也很nice，包括政治素养问答，英文问答，和中文问答。中文问题都很开放，比如介绍你最熟悉的一个项目等。</p>
+  
+  <!-- 图片形式③：滑动图集。在 .slides 里复制 <img> 即可加图，箭头与页码由脚本自动生成状态 -->
+  <div class="slideshow" data-slideshow>
+   <div class="slides-viewport">
+    <div class="slides">
+      <img src="assets/tju2.jpg" alt="校门" data-caption="同济大学嘉定校区" loading="lazy">
+      <img src="assets/tju3.jpg" alt="湖" data-caption="一进校门的河道" loading="lazy">
+      <img src="assets/tju4.jpg" alt="教学楼" data-caption="教学楼，好多共享单车" loading="lazy">
+      <img src="assets/tju5.jpg" alt="笔试现场" data-caption="笔试现场" loading="lazy">
+      <img src="assets/tju6.jpg" alt="美食街" data-caption="美食街/商业街，居然在校园内部有这样的街道" loading="lazy">
+      <img src="assets/tju7.jpg" alt="学院楼" data-caption="学院楼" loading="lazy">
+      <img src="assets/tju8.jpg" alt="小杨生煎" data-caption="每次来上海必吃小杨生煎，一次不落" loading="lazy">
+      <img src="assets/tju9.jpg" alt="喜茶" data-caption="湾湾请的喜茶" loading="lazy">
+      <img src="assets/tju10.jpg" alt="莱莱小笼" data-caption="莱莱小笼，和湾湾共进午餐" loading="lazy">
+    </div>
+    <button class="slide-btn prev" aria-label="上一张">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M15 5 L8 12 L15 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="slide-btn next" aria-label="下一张">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M9 5 L16 12 L9 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="slide-counter"><span class="current">1</span> / <span class="total">1</span></div>
+   </div>
+    <!-- 图注文字由脚本从当前图片的 data-caption 读取，无需手写 -->
+    <p class="slideshow-caption" aria-live="polite"></p>
+  </div>
+
+  <p>这是我最喜欢的校园环境之一。有人气也有活力，里面的配套设施非常完备，各种美食店铺和奶茶店，非常多，一墙之隔也有商业街。只是地方偏远。</p>
+  <p>还在上海遇见湾湾，真是他乡遇故知。</p>
+
+  <p class="lead">最后感谢家里的支持，包括物质和精神！</p>
+
+  <p class="signoff">—— 小牛，写于2026年11月</p>
+</article>
+
+
+<!-- 关于：简单自我介绍，可删可改 -->
+<section class="about" id="about">
+  <h2>关于</h2>
+  <p>小牛，一个回忆者。相信最好的风景永远在下一个转弯。</p>
+</section>
+
+<!-- 页脚 -->
+<footer class="site-footer">
+  <span>© 2026夏 全国飞行记</span>
+  <span>用记录抵抗遗忘</span>
+</footer>
+
+<script>
+/* 滑动图集控制：支持箭头翻页、手指/触控板滑动、页码同步、边界自动禁用 */
+(function(){
+  "use strict";
+  var prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  document.querySelectorAll("[data-slideshow]").forEach(function(root){
+    var track = root.querySelector(".slides");
+    var imgs = track.querySelectorAll("img");
+    var prevBtn = root.querySelector(".slide-btn.prev");
+    var nextBtn = root.querySelector(".slide-btn.next");
+    var currentEl = root.querySelector(".current");
+    var totalEl = root.querySelector(".total");
+    var captionEl = root.querySelector(".slideshow-caption");
+    var lastIdx = -1;
+    var captionTimer = null;
+    totalEl.textContent = imgs.length;
+
+    function move(dir){
+      track.scrollBy({
+        left: dir * track.clientWidth,
+        behavior: prefersReduced ? "auto" : "smooth"
+      });
+    }
+    prevBtn.addEventListener("click", function(){ move(-1); });
+    nextBtn.addEventListener("click", function(){ move(1); });
+
+    /* 读取指定图片的 data-caption，先淡出再换字淡入 */
+    function setCaption(idx){
+      var text = imgs[idx].getAttribute("data-caption") || "";
+      if(prefersReduced){
+        captionEl.textContent = text;
+        return;
+      }
+      captionEl.classList.add("switching");
+      clearTimeout(captionTimer);
+      captionTimer = setTimeout(function(){
+        captionEl.textContent = text;
+        captionEl.classList.remove("switching");
+      }, 160);
+    }
+
+    function update(){
+      var w = track.clientWidth;
+      if(!w) return;                          /* 布局未就绪时安全退出 */
+      var idx = Math.round(track.scrollLeft / w);
+      /* 边界钳制：任何瞬时状态下索引都不会越界 */
+      idx = Math.min(Math.max(idx, 0), imgs.length - 1);
+      currentEl.textContent = idx + 1;
+      prevBtn.disabled = (idx === 0);
+      nextBtn.disabled = (idx === imgs.length - 1);
+      if(idx !== lastIdx){
+        lastIdx = idx;
+        setCaption(idx);
+      }
+    }
+    track.addEventListener("scroll", update, {passive:true});
+    window.addEventListener("resize", update);
+    update();
+  });
+})();
+</script>
+</body>
+</html>
